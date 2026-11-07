@@ -1233,6 +1233,17 @@ button {
   font-size: 11px;
 }
 
+.database-message {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--red) 8%, var(--surface));
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .settings-layout {
   display: grid;
   grid-template-columns: 190px minmax(0, 690px);

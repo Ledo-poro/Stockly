@@ -1,4 +1,21 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) warehouse management workspace.
+
+## PostgreSQL Setup
+
+The Projects page uses Prisma with PostgreSQL. Copy `.env.example` to `.env` and set `DATABASE_URL` to your PostgreSQL connection string:
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public"
+```
+
+Then generate the Prisma Client and create/apply the development migration:
+
+```bash
+npm run db:generate
+npm run db:migrate -- --name init
+```
+
+Start the app with `npm run dev`. The PostgreSQL server must be reachable when you run migrations and use the Projects page. `.env` is ignored by Git; do not commit database credentials.
 
 ## Getting Started
 
