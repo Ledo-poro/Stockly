@@ -25,7 +25,7 @@ export function DashboardView() {
         </div>
         <div className="heading-actions">
           <button type="button" className="button button-secondary"><ScanLine size={16} />{arabic ? "مسح عنصر" : "Scan item"}</button>
-          <Link href="/Projects" className="button button-primary"><Plus size={16} />{arabic ? "مشروع جديد" : "New project"}</Link>
+          <Link href="/Inventory" className="button button-primary"><Plus size={16} />{arabic ? "مخزون جديد" : "New inventory"}</Link>
         </div>
       </div>
 
