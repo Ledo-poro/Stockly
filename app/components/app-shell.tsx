@@ -35,7 +35,7 @@ export function useAppPreferences() {
 const translations = {
   en: {
     dashboard: "Dashboard",
-    projects: "Projects",
+    projects: "Inventory",
     settings: "Settings",
     workspace: "WORKSPACE",
     search: "Search inventory...",
@@ -46,7 +46,7 @@ const translations = {
   },
   ar: {
     dashboard: "لوحة المعلومات",
-    projects: "المشاريع",
+    projects: "المخزون",
     settings: "الإعدادات",
     workspace: "مساحة العمل",
     search: "ابحث في المخزون...",
@@ -81,7 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   }, [theme, language, ready]);
 
-  const activePage = pathname.startsWith("/Projects")
+  const activePage = pathname.startsWith("/Inventory") || pathname.startsWith("/Projects")
     ? "projects"
     : pathname.startsWith("/Setting")
       ? "settings"
@@ -89,7 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const navItems = [
     { key: "dashboard", href: "/", icon: LayoutDashboard, label: copy.dashboard },
-    { key: "projects", href: "/Projects", icon: ClipboardList, label: copy.projects },
+    { key: "projects", href: "/Inventory", icon: ClipboardList, label: copy.projects },
     { key: "settings", href: "/Setting", icon: Settings, label: copy.settings },
   ];
 
