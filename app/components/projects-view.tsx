@@ -59,7 +59,17 @@ export function ProjectsView() {
     setDatabaseError(null);
     try {
       if (editingProjectId) {
-        setProjects((current) => current.map((project) => project.id === editingProjectId ? { ...project, name } : project));
+        const response = await fetch(`/api/projects/${editingProjectId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name }),
+        });
+        if (!response.ok) {
+          const result = await response.json() as { error?: string };
+          throw new Error(result.error ?? "Project could not be updated.");
+        }
+        const { project } = await response.json() as { project: Project };
+        setProjects((current) => current.map((item) => item.id === project.id ? project : item));
         setShowForm(false);
         setEditingProjectId(null);
         setDraftName("");
@@ -99,9 +109,19 @@ export function ProjectsView() {
     setShowForm(true);
   }
 
-  function deleteProject(projectId: string) {
+  async function deleteProject(projectId: string) {
     setMenuProjectId(null);
-    setProjects((current) => current.filter((project) => project.id !== projectId));
+    setDatabaseError(null);
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, { method: "DELETE" });
+      if (!response.ok) {
+        const result = await response.json() as { error?: string };
+        throw new Error(result.error ?? "Project could not be deleted.");
+      }
+      setProjects((current) => current.filter((project) => project.id !== projectId));
+    } catch (error: unknown) {
+      setDatabaseError(error instanceof Error ? error.message : "Could not connect to PostgreSQL.");
+    }
   }
 
   return (
