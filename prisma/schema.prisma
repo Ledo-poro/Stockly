@@ -17,6 +17,9 @@ model Project {
   id        String        @id @default(cuid())
   code      String        @unique
   name      String
+  itemCount Int           @default(0)
+  source    String?
+  arrivalDate DateTime?
   location  String        @default("Unassigned")
   owner     String        @default("Unassigned")
   status    ProjectStatus @default(PLANNING)

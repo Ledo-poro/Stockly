@@ -955,7 +955,7 @@ button {
 
 .project-summary-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(160px, 1.15fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: center;
   min-height: 83px;
   margin-bottom: 16px;
@@ -1005,6 +1005,100 @@ button {
   display: flex;
   align-items: center;
   gap: 9px;
+}
+
+.toolbar-control {
+  position: relative;
+}
+
+.control-count {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  color: var(--surface);
+  border-radius: 50%;
+  background: var(--green);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.toolbar-popover {
+  position: absolute;
+  z-index: 15;
+  top: calc(100% + 8px);
+  width: min(310px, calc(100vw - 32px));
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.filter-popover {
+  left: 0;
+}
+
+.sort-popover {
+  right: 0;
+  width: min(240px, calc(100vw - 32px));
+}
+
+.toolbar-popover label {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.toolbar-popover select,
+.toolbar-popover input {
+  width: 100%;
+  min-width: 0;
+  height: 31px;
+  padding: 0 8px;
+  color: var(--foreground);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--background);
+  font: inherit;
+  font-size: 10px;
+}
+
+.filter-popover > label + label,
+.sort-popover > label + label {
+  margin-top: 11px;
+}
+
+.popover-heading {
+  margin-bottom: 12px;
+  color: var(--foreground);
+  font-size: 11px;
+}
+
+.popover-heading strong {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.popover-heading button {
+  padding: 3px 0;
+  color: var(--green);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.filter-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 11px;
 }
 
 .project-tabs {
@@ -1417,7 +1511,7 @@ button {
 }
 
 .project-modal {
-  width: min(100%, 430px);
+  width: min(100%, 520px);
   padding: 23px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -1471,6 +1565,11 @@ button {
   border-radius: 5px;
   background: var(--background);
   font-size: 11px;
+}
+
+.inventory-form-grid {
+  display: grid;
+  gap: 14px;
 }
 
 .form-label input::placeholder {
@@ -1777,10 +1876,6 @@ button {
   .table-search {
     flex: 1;
     width: auto;
-  }
-
-  .sort-button {
-    display: none;
   }
 
   .projects-table-panel {
