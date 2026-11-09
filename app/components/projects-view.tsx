@@ -19,6 +19,16 @@ type Project = {
   dueDate: string | null;
 };
 
+function normalizeProject(project: Project): Project {
+  return {
+    ...project,
+    itemCount: Number.isFinite(project.itemCount) ? project.itemCount : 0,
+    source: project.source ?? null,
+    arrivalDate: project.arrivalDate ?? null,
+    createdAt: project.createdAt ?? new Date(0).toISOString(),
+  };
+}
+
 export function ProjectsView() {
   const { language } = useAppPreferences();
   const arabic = language === "ar";
@@ -80,7 +90,7 @@ export function ProjectsView() {
         return response.json() as Promise<{ projects: Project[] }>;
       })
       .then(({ projects: loadedProjects }) => {
-        if (active) setProjects(loadedProjects);
+        if (active) setProjects(loadedProjects.map(normalizeProject));
       })
       .catch((error: unknown) => {
         if (active) setDatabaseError(error instanceof Error ? error.message : "Could not connect to PostgreSQL.");
@@ -111,7 +121,8 @@ export function ProjectsView() {
           const result = await response.json() as { error?: string };
           throw new Error(result.error ?? "Project could not be updated.");
         }
-        const { project } = await response.json() as { project: Project };
+        const { project: responseProject } = await response.json() as { project: Project };
+        const project = normalizeProject(responseProject);
         setProjects((current) => current.map((item) => item.id === project.id ? project : item));
         setShowForm(false);
         setEditingProjectId(null);
@@ -131,7 +142,8 @@ export function ProjectsView() {
         const result = await response.json() as { error?: string };
         throw new Error(result.error ?? "Project could not be saved.");
       }
-      const { project } = await response.json() as { project: Project };
+      const { project: responseProject } = await response.json() as { project: Project };
+      const project = normalizeProject(responseProject);
       setProjects((current) => [project, ...current]);
       setShowForm(false);
       setDraftName("");
