@@ -33,6 +33,15 @@ export async function POST(request: Request) {
   const itemCount = typeof body === "object" && body !== null && "itemCount" in body && typeof body.itemCount === "number"
     ? body.itemCount
     : NaN;
+  const lowStockLimit = typeof body === "object" && body !== null && "lowStockLimit" in body && typeof body.lowStockLimit === "number"
+    ? body.lowStockLimit
+    : 0;
+  const unitCost = typeof body === "object" && body !== null && "unitCost" in body && typeof body.unitCost === "number"
+    ? body.unitCost
+    : null;
+  const currencyValue = typeof body === "object" && body !== null && "currency" in body && typeof body.currency === "string"
+    ? body.currency.trim().toUpperCase()
+    : "";
   const source = typeof body === "object" && body !== null && "source" in body && typeof body.source === "string"
     ? body.source.trim()
     : "";
@@ -41,13 +50,21 @@ export async function POST(request: Request) {
     : "";
   const arrivalDate = arrivalDateValue ? new Date(`${arrivalDateValue}T00:00:00.000Z`) : null;
 
-  if (!name || name.length > 120 || !Number.isInteger(itemCount) || itemCount < 0 || source.length > 120 || (arrivalDate && Number.isNaN(arrivalDate.getTime()))) {
-    return Response.json({ error: "Enter a name, a non-negative whole item count, and valid source and arrival date values." }, { status: 400 });
+  if (!name || name.length > 120 || !Number.isInteger(itemCount) || itemCount < 0 || !Number.isInteger(lowStockLimit) || lowStockLimit < 0 || (unitCost !== null && (!Number.isFinite(unitCost) || unitCost < 0)) || (unitCost !== null && !/^[A-Z]{3}$/.test(currencyValue)) || (source.length > 120) || (arrivalDate && Number.isNaN(arrivalDate.getTime()))) {
+    return Response.json({ error: "Enter valid inventory details, a non-negative stock limit, and a cost with a three-letter currency." }, { status: 400 });
   }
 
   try {
-    const project = await prisma.project.create({
-      data: { name, itemCount, source: source || null, arrivalDate, code: `PRJ-${randomUUID().slice(0, 8).toUpperCase()}` },
+    const project = await prisma.$transaction(async (transaction) => {
+      const createdProject = await transaction.project.create({
+        data: { name, itemCount, lowStockLimit, unitCost, currency: unitCost === null ? null : currencyValue, source: source || null, arrivalDate, code: `PRJ-${randomUUID().slice(0, 8).toUpperCase()}` },
+      });
+      if (itemCount > 0) {
+        await transaction.stockMovement.create({
+          data: { projectId: createdProject.id, type: "IN", quantityDelta: itemCount, note: "Opening stock", createdAt: arrivalDate ?? new Date() },
+        });
+      }
+      return createdProject;
     });
     return Response.json({ project }, { status: 201 });
   } catch (error) {
