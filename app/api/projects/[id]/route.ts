@@ -24,9 +24,15 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const name = typeof body === "object" && body !== null && "name" in body && typeof body.name === "string"
     ? body.name.trim()
     : "";
-  const itemCount = typeof body === "object" && body !== null && "itemCount" in body && typeof body.itemCount === "number"
-    ? body.itemCount
+  const lowStockLimit = typeof body === "object" && body !== null && "lowStockLimit" in body && typeof body.lowStockLimit === "number"
+    ? body.lowStockLimit
     : NaN;
+  const unitCost = typeof body === "object" && body !== null && "unitCost" in body && typeof body.unitCost === "number"
+    ? body.unitCost
+    : null;
+  const currencyValue = typeof body === "object" && body !== null && "currency" in body && typeof body.currency === "string"
+    ? body.currency.trim().toUpperCase()
+    : "";
   const source = typeof body === "object" && body !== null && "source" in body && typeof body.source === "string"
     ? body.source.trim()
     : "";
@@ -35,13 +41,16 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     : "";
   const arrivalDate = arrivalDateValue ? new Date(`${arrivalDateValue}T00:00:00.000Z`) : null;
 
-  if (!name || name.length > 120 || !Number.isInteger(itemCount) || itemCount < 0 || source.length > 120 || (arrivalDate && Number.isNaN(arrivalDate.getTime()))) {
-    return Response.json({ error: "Enter a name, a non-negative whole item count, and valid source and arrival date values." }, { status: 400 });
+  if (!name || name.length > 120 || !Number.isInteger(lowStockLimit) || lowStockLimit < 0 || (unitCost !== null && (!Number.isFinite(unitCost) || unitCost < 0)) || (unitCost !== null && !/^[A-Z]{3}$/.test(currencyValue)) || source.length > 120 || (arrivalDate && Number.isNaN(arrivalDate.getTime()))) {
+    return Response.json({ error: "Enter valid inventory details, a non-negative stock limit, and a cost with a three-letter currency." }, { status: 400 });
   }
 
   const { id } = await params;
   try {
-    const project = await prisma.project.update({ where: { id }, data: { name, itemCount, source: source || null, arrivalDate } });
+    const project = await prisma.project.update({
+      where: { id },
+      data: { name, lowStockLimit, unitCost, currency: unitCost === null ? null : currencyValue, source: source || null, arrivalDate },
+    });
     return Response.json({ project });
   } catch (error) {
     if (typeof error === "object" && error !== null && "code" in error && error.code === "P2025") {

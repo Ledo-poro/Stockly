@@ -13,20 +13,44 @@ enum ProjectStatus {
   COMPLETED
 }
 
-model Project {
-  id        String        @id @default(cuid())
-  code      String        @unique
-  name      String
-  itemCount Int           @default(0)
-  source    String?
-  arrivalDate DateTime?
-  location  String        @default("Unassigned")
-  owner     String        @default("Unassigned")
-  status    ProjectStatus @default(PLANNING)
-  progress  Int           @default(0)
-  dueDate   DateTime?
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+enum StockMovementType {
+  IN
+  OUT
+  SALE
+  ADJUSTMENT
+}
 
+model Project {
+  id            String          @id @default(cuid())
+  code          String          @unique
+  name          String
+  itemCount     Int             @default(0)
+  lowStockLimit Int             @default(0)
+  unitCost      Decimal?        @db.Decimal(12, 2)
+  currency      String?         @db.VarChar(3)
+  source        String?
+  arrivalDate   DateTime?
+  location      String          @default("Unassigned")
+  owner         String          @default("Unassigned")
+  status        ProjectStatus   @default(PLANNING)
+  progress      Int             @default(0)
+  dueDate       DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  movements     StockMovement[]
+
+  @@index([createdAt])
+}
+
+model StockMovement {
+  id           String            @id @default(cuid())
+  projectId    String
+  type         StockMovementType
+  quantityDelta Int
+  note         String?
+  createdAt    DateTime          @default(now())
+  project      Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
   @@index([createdAt])
 }
